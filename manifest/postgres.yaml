@@ -1,0 +1,95 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: postgres
+  labels:
+    name: postgres
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresconfigmap
+  namespace: postgres
+data:
+  pg_user: postgres
+  pg_db: postgres_test_database
+  pg_data: "/var/lib/postgresql/data/pgdata"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgressecret
+  namespace: postgres
+type: Opaque
+data:
+  pg_password: c2VjcmV0cGFzc3dvcmQK
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: postgres
+  labels:
+    app: postgres
+spec:
+  ports:
+    - port: 5432
+  clusterIP: None
+  selector:
+    app: postgres
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: postgres
+spec:
+  serviceName: "postgres"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:12.4-alpine
+        ports:
+          - containerPort: 5432
+        volumeMounts:
+          - name: postgres-data
+            mountPath: "/var/lib/postgresql/data"
+        env:
+          - name: "PGDATA"
+            valueFrom:
+              configMapKeyRef:
+                name: postgresconfigmap
+                key: pg_data
+          - name: "POSTGRES_USER"
+            valueFrom:
+              configMapKeyRef:
+                name: postgresconfigmap
+                key: pg_user
+          - name: "POSTGRES_DB"
+            valueFrom:
+              configMapKeyRef:
+                name: postgresconfigmap
+                key: pg_db
+          - name: "POSTGRES_PASSWORD"
+            valueFrom:
+              secretKeyRef:
+                name: postgressecret
+                key: pg_password
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
+
