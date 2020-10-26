@@ -28,7 +28,7 @@ metadata:
 data:
   redis.conf: |
     port 6379
-    cluster-enabled yes
+    cluster-enabled no
     cluster-config-file nodes.conf
     cluster-node-timeout 5000
     appendonly yes
@@ -40,7 +40,7 @@ metadata:
   namespace: redis
 spec:
   serviceName: "redis"
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: redis

@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -e
+
+readonly container_name="rails-dev"
+
+if [ -z "${PROJECT_PATH}" ]; then
+  echo "Please set PROJECT_PATH"
+  exit 1
+fi
+
+if [ "$1" == "--force" ]; then
+  docker stop ${container_name} && docker rm ${container_name}
+fi
+
+docker run -it -d \
+  -v "${PROJECT_PATH}:/var/www/app" \
+  -v "$(pwd)/gems:/usr/local/bundle" \
+  -v "$(pwd)/database.yml:/var/www/app/config/database.yml" \
+  -v "$(pwd)/node_modules:/var/www/app/node_modules" \
+  -p 33000:3000 \
+  --name ${container_name} \
+  rails-dev:0.0.1 \
+  bash
+  #bundle exec rails s --bind "0.0.0.0" --port 3000

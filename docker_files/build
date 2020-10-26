@@ -4,4 +4,4 @@ set -eu
 
 readonly DOCKER_FILE_PATH="rails-devapp.Dockerfile"
 
-docker build -t rails-dev:0.0.1 -f ${DOCKER_FILE_PATH} .
+docker build -t rails-dev:0.0.1 - < ${DOCKER_FILE_PATH}
