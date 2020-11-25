@@ -35,7 +35,7 @@ metadata:
 spec:
   ports:
     - port: 5432
-  clusterIP: None
+  type: NodePort
   selector:
     app: postgres
 ---

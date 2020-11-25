@@ -36,3 +36,24 @@ Login into a pod
 ```sh
   yay -Syu kubefwd-bin
 ```
+
+# Access Postgres from the machine
+
+I like the idea to have the Kubernetes cluster manages all softwares required for development.
+Docker is good but I need to start each individual containers.
+
+Docker Compose is old date fashion, but a sharping tool. However, Kubernetes is sexy, hell yeah.
+
+When I write code, I need to run it directly from my machine.
+
+So I need to connect my code to the service from the Kubernetes cluster.
+
+Hence my idea is to:
+
+- Create a kubernetes service with type nodeport
+- Find the nodeport ip
+
+```bash
+kubectl get nodes -o wide --no-headers | awk '{print $6}'
+```
+
